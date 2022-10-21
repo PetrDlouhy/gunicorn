@@ -220,8 +220,14 @@ class Arbiter(object):
                 if not handler:
                     self.log.error("Unhandled signal: %s", signame)
                     continue
-                self.log.info("Handling signal: %s", signame)
-                handler()
+                if signame == "term":
+                    self.log.info("Gunicorn is not handling signal: %s", signame)
+                else:
+                    if signame == "usr1":
+                        self.log.info("Redirectring signal usr1 to term")
+                        signame = "term"
+                    self.log.info("Handling signal: %s", signame)
+                    handler()
                 self.wakeup()
         except (StopIteration, KeyboardInterrupt):
             self.halt()
